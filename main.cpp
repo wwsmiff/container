@@ -2,58 +2,92 @@
 #include <stdexcept>
 #include <vector>
 
-template<typename T, size_t S = 1>
+template<typename T, size_t S = 0>
 class Container
 {
 public:
     Container(void)
     {
-        m_Ptr = static_cast<T*>(malloc(S * sizeof(T)));
-        if(!m_Ptr) throw std::bad_alloc();
+        if(m_Size)
+        {
+            m_Ptr = static_cast<T*>(malloc(m_Size * sizeof(T)));
+        }
     }
 
     ~Container()
     {
-        m_Ptr = nullptr;
         if(m_Ptr) free(m_Ptr);
     }
     
-    size_t Size() const
+    size_t GetSize() const
     {
         return m_Size;
     }
 
-    T &operator[](size_t idx)
+    T &operator[](size_t _idx)
     {
-        if(idx >= m_Size) throw std::out_of_range("Index is out of bounds");
-        return m_Ptr[idx];
+        if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
+        return m_Ptr[_idx];
     }
 
-
-    void operator=(T arr[])
+    void Append(const T &_element)
     {
-        for(size_t i = 0; i < m_Size; ++i)
-        {
-            m_Ptr[i] = arr[i];
-        }
+        m_Size++;
+        Resize(m_Size);
+        m_Ptr[m_Size - 1] = _element;
     }
 
-    void Resize(size_t newSize)
+    T Pop(void)
     {
-        if(m_Ptr)
+        m_Size--;
+        T tmp = m_Ptr[m_Size];
+        Resize(m_Size);
+    
+        return tmp;
+    }
+
+    void Clear(void)
+    {
+        m_Size = 0;
+        Resize(m_Size);
+    }
+
+    void BubbleSort(void)
+    {
+        for(size_t i = 0; i < m_Size; i++)
         {
-            if(newSize)
+            for(size_t j = 0; j < m_Size - i - 1; j++)
             {
-                m_Ptr = static_cast<T*>(realloc(m_Ptr, newSize * sizeof(T)));
+                if(m_Ptr[j] > m_Ptr[j + 1])
+                {
+                    T tmp = m_Ptr[j];
+                    m_Ptr[j] = m_Ptr[j + 1];
+                    m_Ptr[j + 1] = tmp;
+                }
             }
         }
-        else if(m_Size)
-        {
-            m_Ptr = static_cast<T*>(malloc(newSize * sizeof(T)));
-        }
-        else throw std::bad_alloc();
+    }
 
-        m_Size = newSize;
+    T Max(void)
+    {
+        T max = m_Ptr[0];
+        for(size_t i = 0; i < m_Size; ++i)
+        {
+            if(m_Ptr[i] > max) max = m_Ptr[i];
+        }
+
+        return max;
+    }
+
+    T Min(void)
+    {
+        T min = m_Ptr[0];
+        for(size_t i = 0; i < m_Size; ++i)
+        {
+            if(m_Ptr[i] < min) min = m_Ptr[i];
+        }
+
+        return min;
     }
 
     template<typename __T, size_t __S>
@@ -62,31 +96,71 @@ public:
 private:
     size_t m_Size = S;
     T *m_Ptr = nullptr;
+
+    void Resize(size_t _newSize)
+    {
+        if(m_Ptr)
+        {
+            if(_newSize)
+            {
+                m_Ptr = static_cast<T*>(realloc(m_Ptr, _newSize * sizeof(T)));
+            }
+        }
+        else if(m_Size)
+        {
+            m_Ptr = static_cast<T*>(malloc(_newSize * sizeof(T)));
+        }
+        else throw std::bad_alloc();
+
+        m_Size = _newSize;
+    }
 };
 
 template<typename T, size_t S>
 std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
 {
-    out << '{';
-    for(size_t i = 0; i < other.m_Size - 1; ++i)
+    if(other.m_Size)
     {
-        std::cout <<  other.m_Ptr[i] << ", ";
+        out << '{';
+        for(size_t i = 0; i < other.m_Size - 1; ++i)
+        {
+            std::cout <<  other.m_Ptr[i] << ", ";
+        }
+        std::cout << other.m_Ptr[other.m_Size - 1] << "}";
     }
-    std::cout << other.m_Ptr[other.m_Size - 1] << "}";
+
+    else out << "";
 
     return out;
 }
 
 int main(void)
 {
-    Container<int, 7> container; 
+    Container<int32_t> container; 
 
-    for(int i = 0; i < container.Size(); ++i)
-    {
-        container[i] = 2*i;
-    }
+    container.Append(7);
+    container.Append(10);
+    container.Append(1);
+    container.Append(66);
+    container.Append(8);
+    container.Append(13);
+    container.Append(11);
+    container.Append(344);
+    container.Append(999);
+    container.Append(1111);
+    container.Append(454);
+    container.Append(16);
+    container.Append(12);
+    container.Append(100);
+    container.Append(-1);
+    container.Append(-112);
+    container.Append(-1111);
+
 
     std::cout << container << std::endl;
+
+    std::cout << container.Max() << std::endl;
+    std::cout << container.Min() << std::endl;
 
     return EXIT_SUCCESS;
 }
