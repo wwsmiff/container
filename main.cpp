@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <cstring>
+#include <cstdlib>
 
 template<typename T, size_t S = 0>
 class Container
@@ -29,13 +30,7 @@ public:
 
 	T &operator[](int64_t _idx)
     {
-		if(_idx < 0)
-		{
-			_idx = (m_Size - 1) - ~(_idx);
-		}
-		
-		std::cout << _idx << std::endl;
-		
+		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
 		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
 
         return *(m_Ptr + _idx);
@@ -148,7 +143,7 @@ std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
 int main(void)
 {
 	Container<float, 10> container;
-	container[-10] = 3.1415f;
+	container[-2] = 3.1415f;
 	std::cout << container << std::endl;
 
 	return 0;
