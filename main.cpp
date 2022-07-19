@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <cstring>
 
 template<typename T, size_t S = 0>
 class Container
@@ -10,8 +11,10 @@ public:
     {
         if(m_Size)
         {
-            m_Ptr = static_cast<T*>(malloc(m_Size * sizeof(T)));
+            m_Ptr = static_cast<T*>(malloc(sizeof(T) * m_Size));
         }
+
+		memset(m_Ptr, 0, S * sizeof(T));
     }
 
     ~Container()
@@ -19,15 +22,23 @@ public:
         if(m_Ptr) free(m_Ptr);
     }
     
-    size_t GetSize() const
+    size_t Size() const
     {
         return m_Size;
     }
 
-    T &operator[](size_t _idx)
+	T &operator[](int64_t _idx)
     {
-        if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
-        return m_Ptr[_idx];
+		if(_idx < 0)
+		{
+			_idx = (m_Size - 1) - ~(_idx);
+		}
+		
+		std::cout << _idx << std::endl;
+		
+		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
+
+        return *(m_Ptr + _idx);
     }
 
     void Append(const T &_element)
@@ -110,6 +121,7 @@ private:
         {
             m_Ptr = static_cast<T*>(malloc(_newSize * sizeof(T)));
         }
+
         else throw std::bad_alloc();
 
         m_Size = _newSize;
@@ -128,7 +140,6 @@ std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
         }
         std::cout << other.m_Ptr[other.m_Size - 1] << "}";
     }
-
     else out << "";
 
     return out;
@@ -136,31 +147,9 @@ std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
 
 int main(void)
 {
-    Container<int32_t> container; 
+	Container<float, 10> container;
+	container[-10] = 3.1415f;
+	std::cout << container << std::endl;
 
-    container.Append(7);
-    container.Append(10);
-    container.Append(1);
-    container.Append(66);
-    container.Append(8);
-    container.Append(13);
-    container.Append(11);
-    container.Append(344);
-    container.Append(999);
-    container.Append(1111);
-    container.Append(454);
-    container.Append(16);
-    container.Append(12);
-    container.Append(100);
-    container.Append(-1);
-    container.Append(-112);
-    container.Append(-1111);
-
-
-    std::cout << container << std::endl;
-
-    std::cout << container.Max() << std::endl;
-    std::cout << container.Min() << std::endl;
-
-    return EXIT_SUCCESS;
+	return 0;
 }

@@ -10,7 +10,8 @@
                 "-std=c++17",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-lbenchmark"
             ],
             "options": {
                 "cwd": "${fileDirname}"
