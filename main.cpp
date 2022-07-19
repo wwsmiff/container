@@ -27,7 +27,15 @@ public:
     {
         return m_Size;
     }
+	
+	T &operator[](int64_t _idx) const
+    {
+		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
+		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
 
+        return *(m_Ptr + _idx);
+    }
+	
 	T &operator[](int64_t _idx)
     {
 		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
@@ -96,8 +104,8 @@ public:
         return min;
     }
 
-    template<typename __T, size_t __S>
-    friend std::ostream &operator<<(std::ostream &out, const Container<__T, __S> &other);
+    // template<typename __T, size_t __S>
+    // friend std::ostream &operator<<(std::ostream &out, const Container<__T, __S> &other);
 
 private:
     size_t m_Size = S;
@@ -126,15 +134,16 @@ private:
 template<typename T, size_t S>
 std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
 {
-    if(other.m_Size)
+    if(other.Size())
     {
-        out << '{';
-        for(size_t i = 0; i < other.m_Size - 1; ++i)
+        out << "{";
+        for(int32_t i = 0; i < other.Size()- 1; ++i)
         {
-            std::cout <<  other.m_Ptr[i] << ", ";
+            std::cout <<  other[i] << ", ";
         }
-        std::cout << other.m_Ptr[other.m_Size - 1] << "}";
+        std::cout << other[other.Size() - 1] << "}";
     }
+
     else out << "";
 
     return out;
@@ -146,5 +155,5 @@ int main(void)
 	container[-2] = 3.1415f;
 	std::cout << container << std::endl;
 
-	return 0;
+	return EXIT_SUCCESS;
 }
