@@ -15,8 +15,26 @@ public:
             m_Ptr = static_cast<T*>(malloc(sizeof(T) * m_Size));
         }
 
-		memset(m_Ptr, 0, S * sizeof(T));
+		for(size_t i = 0; i < m_Size; ++i)
+		{
+			m_Ptr[i] = 0;
+		}
     }
+
+	Container(size_t size)
+	{
+		m_Size = size;
+
+		if(m_Size)
+        {
+            m_Ptr = static_cast<T*>(malloc(sizeof(T) * m_Size));
+        }
+
+		for(size_t i = 0; i < m_Size; ++i)
+		{
+			m_Ptr[i] = 0;
+		}
+	}
 
     ~Container()
     {
@@ -43,7 +61,22 @@ public:
 
         return *(m_Ptr + _idx);
     }
+	
+	T &at(int64_t _idx) const
+    {
+		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
+		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
 
+        return *(m_Ptr + _idx);
+    }
+	
+	T &at(int64_t _idx)
+    {
+		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
+		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
+
+        return *(m_Ptr + _idx);
+    }
     void Append(const T &_element)
     {
         m_Size++;
@@ -104,10 +137,18 @@ public:
         return min;
     }
 
-    // template<typename __T, size_t __S>
-    // friend std::ostream &operator<<(std::ostream &out, const Container<__T, __S> &other);
+	Container<T> Slice(int32_t start = 0, int32_t end = Size(), int32_t step = 1) const
+	{
+		Container<T> __tmp;
+		for(size_t i = start; i < end; i += step)
+		{
+			__tmp.Append(this->at(i));
+		}
 
-private:
+		return __tmp;
+	}	
+
+protected:
     size_t m_Size = S;
     T *m_Ptr = nullptr;
 
@@ -152,8 +193,14 @@ std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
 int main(void)
 {
 	Container<float, 10> container;
-	container[-2] = 3.1415f;
+
+	for(size_t i = 0; i < container.Size(); ++i)
+	{
+		container[i] = i + 1;
+	}
+
 	std::cout << container << std::endl;
+	std::cout << container.Slice(0, container.Size(), 3) << std::endl;
 
 	return EXIT_SUCCESS;
 }
