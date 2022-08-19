@@ -82,12 +82,6 @@ public:
         return m_Size;
     }
 
-	template<typename __T>
-	void Init(T fn)
-	{
-		this->append(fn());	
-	}
-	
 	T &operator[](int64_t _idx) const
     {
 		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
