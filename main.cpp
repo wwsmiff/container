@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <cstdlib>
+#include <cstdarg>
 
 template<typename T, size_t S = 0>
 class Container
@@ -62,21 +63,6 @@ public:
         return *(m_Ptr + _idx);
     }
 	
-	T &at(int64_t _idx) const
-    {
-		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
-		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
-
-        return *(m_Ptr + _idx);
-    }
-	
-	T &at(int64_t _idx)
-    {
-		if(_idx < 0) _idx = (m_Size - 1) - ~(_idx);
-		if(_idx >= m_Size) throw std::out_of_range("Index is out of bounds");
-
-        return *(m_Ptr + _idx);
-    }
     void Append(const T &_element)
     {
         m_Size++;
@@ -107,9 +93,9 @@ public:
             {
                 if(m_Ptr[j] > m_Ptr[j + 1])
                 {
-                    T tmp = m_Ptr[j];
-                    m_Ptr[j] = m_Ptr[j + 1];
-                    m_Ptr[j + 1] = tmp;
+                    T tmp = (*this)[j];
+                    (*this)[j] = (*this)[j + 1];
+                    (*this)[j + 1] = tmp;
                 }
             }
         }
@@ -117,10 +103,10 @@ public:
 
     T Max(void)
     {
-        T max = m_Ptr[0];
+        T max = (*this)[0];
         for(size_t i = 0; i < m_Size; ++i)
         {
-            if(m_Ptr[i] > max) max = m_Ptr[i];
+            if((*this)[0] > max) max = (*this)[i];
         }
 
         return max;
@@ -128,25 +114,47 @@ public:
 
     T Min(void)
     {
-        T min = m_Ptr[0];
+        T min = (*this)[0];
         for(size_t i = 0; i < m_Size; ++i)
         {
-            if(m_Ptr[i] < min) min = m_Ptr[i];
+            if((*this)[i] < min) min = (*this)[i];
         }
 
         return min;
     }
 
-	Container<T> Slice(int32_t start = 0, int32_t end = Size(), int32_t step = 1) const
+	Container<T> Slice(size_t start, size_t end, size_t step)
 	{
 		Container<T> __tmp;
 		for(size_t i = start; i < end; i += step)
 		{
-			__tmp.Append(this->at(i));
+			__tmp.Append((*this)[i]);
+		}
+		
+		return __tmp;
+	}
+
+	Container<T> Slice(int32_t end)
+	{
+		Container<T> __tmp;
+		for(size_t i = 0; i < end; ++i)
+		{
+			__tmp.Append((*this)[i]);
 		}
 
 		return __tmp;
-	}	
+	}
+
+	Container<T> Slice(int32_t start, int32_t end)
+	{
+		Container<T> __tmp;
+		for(size_t i = start; i < end; ++i)
+		{
+			__tmp.Append((*this)[i]);
+		}
+
+		return __tmp;
+	}
 
 protected:
     size_t m_Size = S;
@@ -178,7 +186,7 @@ std::ostream &operator<<(std::ostream &out, const Container<T, S> &other)
     if(other.Size())
     {
         out << "{";
-        for(int32_t i = 0; i < other.Size()- 1; ++i)
+        for(size_t i = 0; i < other.Size()- 1; ++i)
         {
             std::cout <<  other[i] << ", ";
         }
@@ -196,10 +204,11 @@ int main(void)
 
 	for(size_t i = 0; i < container.Size(); ++i)
 	{
-		container[i] = i + 1;
+		container[i] = i + 1 + 0.33f;
 	}
 
 	std::cout << container << std::endl;
+	container.BubbleSort();
 	std::cout << container.Slice(0, container.Size(), 3) << std::endl;
 
 	return EXIT_SUCCESS;
