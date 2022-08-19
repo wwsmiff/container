@@ -68,7 +68,7 @@ public:
 
 		for(int i = 0; i < m_Size; ++i)
 		{
-			m_Ptr[i]();
+			m_Ptr[i] = m_Ptr[i]();
 		}
 	}
 
