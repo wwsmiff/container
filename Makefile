@@ -1,10 +1,10 @@
 CC = g++
-CFLAGS = -std=c++17 -c
+CFLAGS = -std=c++17 -pedantic -c
 
 main: main.o
 	${CC} main.o -o main 
 
-main.o: main.cpp
+main.o: main.cpp Container.hpp
 	${CC} ${CFLAGS} main.cpp
 
 .PHONY: clean
