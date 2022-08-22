@@ -2,7 +2,7 @@
 #include <benchmark/benchmark.h>
 #include <cmath>
 
-const auto LOOPS = std::pow(10, 8);
+const auto LOOPS = std::pow(10, 5);
 
 static void BM_ContainerBenchmark(benchmark::State &state)
 {

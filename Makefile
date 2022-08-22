@@ -6,10 +6,10 @@ all: main
 benchmarks: benchmarks.o
 	${CC} benchmarks.o -o benchmarks -lbenchmark
 
-benchmarks.o: Benchmarks/benchmarks.cpp
+benchmarks.o: Benchmarks/benchmarks.cpp Container.hpp
 	${CC} ${CFLAGS} Benchmarks/benchmarks.cpp
 
-main: main.o
+main: main.o 
 	${CC} main.o -o main 
 
 main.o: main.cpp Container.hpp
@@ -17,7 +17,7 @@ main.o: main.cpp Container.hpp
 
 .PHONY: clean
 clean:
-	rm -f *.o main benchmarks
+	rm -f *.o main benchmarks core*
 
 .PHONY: run
 run:

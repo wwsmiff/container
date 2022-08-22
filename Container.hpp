@@ -45,6 +45,29 @@ T rand(int32_t start, int32_t stop)
 
 };
 
+namespace memutils
+{
+inline void *reallocate(void *old_block, size_t n)
+{
+	size_t i = 0;
+	char *new_block = static_cast<char*>(malloc(n));
+	char *tmp = static_cast<char*>(old_block);
+	//while(n--)
+	//{
+	//	if(tmp) *(new_block + n) = *(tmp + n);
+	//}
+	if(tmp)
+	{
+		memcpy(new_block, tmp, n);
+	}
+
+	if(old_block) free(old_block);
+
+	return new_block;
+}
+
+};
+
 template<typename T, size_t S = 0>
 class Container
 {
@@ -100,9 +123,8 @@ public:
 	
     void Append(const T &_element)
     {
-        m_Size++;
-        Resize(m_Size);
-        m_Ptr[m_Size - 1] = _element;
+        Resize(++m_Size);
+		m_Ptr[m_Size - 1] = _element;
     }
 
     T Pop(void)
@@ -203,24 +225,54 @@ protected:
     size_t m_Size = S;
     T *m_Ptr = nullptr;
 
-    void Resize(size_t _newSize)
-    {
-        if(m_Ptr)
-        {
-            if(_newSize)
-            {
-                m_Ptr = static_cast<T*>(realloc(m_Ptr, _newSize * sizeof(T)));
-            }
-        }
-        else if(m_Size)
-        {
-            m_Ptr = static_cast<T*>(malloc(_newSize * sizeof(T)));
-        }
+    // void Resize(size_t _newSize)
+    // {
+    //     if(m_Ptr)
+    //     {
+    //         if(_newSize)
+    //         {
+    //             m_Ptr = static_cast<T*>(realloc(m_Ptr, _newSize * sizeof(T)));
+    //         }
+    //     }
+    //     else if(m_Size)
+    //     {
+    //         m_Ptr = static_cast<T*>(malloc(_newSize * sizeof(T)));
+    //     }
 
-        else throw std::bad_alloc();
+    //     else throw std::bad_alloc();
 
-        m_Size = _newSize;
-    }
+    //     m_Size = _newSize;
+    // }
+	
+	// void Resize(size_t _newsize)
+	// {
+	// 	T *new_chunk = nullptr;
+	// 	if(_newsize)
+	// 	{
+	// 		new_chunk = static_cast<T*>(malloc(_newsize * sizeof(T)));
+
+	// 		if(m_Ptr)
+	// 		{
+	// 			for(size_t i = 0; i < m_Size; ++i)
+	// 			{
+	// 				new_chunk[i] = m_Ptr[i];
+	// 			}
+
+	// 			if(m_Ptr) free(m_Ptr);
+	// 		}
+	// 	}
+	// 	
+	// 	if(new_chunk)
+	// 	{
+	// 		m_Ptr = new_chunk;
+	// 		m_Size = _newsize;
+	// 	}
+	// }
+	
+	void Resize(size_t _newsize)
+	{
+		m_Ptr = static_cast<T*>(memutils::reallocate(static_cast<void*>(m_Ptr), m_Size * sizeof(T)));
+	}
 };
 
 template<typename T, size_t S>
